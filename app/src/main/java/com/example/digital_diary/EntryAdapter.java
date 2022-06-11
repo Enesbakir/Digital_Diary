@@ -3,6 +3,7 @@ package com.example.digital_diary;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -47,7 +49,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
         holder.textEntryLocation.setText(entryList.get(position).getLocation());
         holder.textEntryTitle.setText(entryList.get(position).getTitle());
         holder.textEntryDate.setText(entryList.get(position).getDate());
-        holder.imageView.setImageResource(R.drawable.ic_smile_image);
+        holder.imageView.setImageResource(R.drawable.download_icon_note_icon_1320185594691690734_256);
         holder.itemCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,7 +101,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView textEntryTitle,textEntryDate,textEntryLocation;
-        public ImageView imageView,passwordStatus,optionsMenuButton;
+        public ImageView imageView,passwordStatus;
+        public ImageButton optionsMenuButton,shareButton;
         public CardView itemCard;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -108,10 +111,12 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
             this.textEntryLocation=(TextView)itemView.findViewById(R.id.location);
             this.imageView = (ImageView)itemView.findViewById(R.id.imageView);
             this.passwordStatus=(ImageView)itemView.findViewById(R.id.passwordStatus);
-            this.optionsMenuButton= (ImageView)itemView.findViewById(R.id.menuButton);
+            this.optionsMenuButton= (ImageButton) itemView.findViewById(R.id.menuButton);
+            this.shareButton = (ImageButton)itemView.findViewById(R.id.shareButton);
             this.itemCard = (CardView) itemView.findViewById(R.id.entryCard);
             dbHelper =new DBHelper(itemView.getContext());
             optionsMenuButton.setOnClickListener(this);
+            shareButton.setOnClickListener(this);
         }
 
 
@@ -120,7 +125,20 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
             if(view==optionsMenuButton){
                 optionsMenuButtonFunction(view,getLayoutPosition());
             }
+            if(view == shareButton){
+                shareMemory(view,getLayoutPosition());
+            }
         }
+
+        private void shareMemory(View view, int position){
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            String text=""+entryArrayList.get(position).getTitle()+"\n" +entryArrayList.get(position).getEnrtyText() + "\n\nLocation: " + entryArrayList.get(position).getLocation()+ "\n" +entryArrayList.get(position).getDate();
+            intent.putExtra(Intent.EXTRA_TEXT,text);
+            view.getContext().startActivity(Intent.createChooser(intent, null));
+        }
+
+
 
         private void optionsMenuButtonFunction(View view,int position){
             PopupMenu popupMenu = new PopupMenu(view.getContext(),optionsMenuButton);
@@ -145,10 +163,25 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
                     if(entryArrayList.get(position).getPassword()!=null){
                         setDialog(clickedButton);
                     }else{
-                        dbHelper.deleteEntry(entryArrayList.get(position).getId());
-                        entryArrayList.remove(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, entryArrayList.size());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                        builder.setTitle("Delete Entry");
+                        builder.setMessage("Are you sure you want to delete?");
+                        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // continue with delete
+                                dbHelper.deleteEntry(entryArrayList.get(position).getId());
+                                entryArrayList.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeChanged(position, entryArrayList.size());
+                            }
+                        });
+                        builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // close dialog
+                                dialog.cancel();
+                            }
+                        });
+                        builder.show();
                     }
                 }
 
@@ -168,13 +201,14 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
                     final EditText input = new EditText(view.getContext());
                     input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     builder.setView(input);
+
                     builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             String m_Text = input.getText().toString();
                             if(clickedButton.equals("Add or Update Password")){
                                 if(m_Text.equals("")){
-                                    Toast.makeText(view.getContext(), "You need to entry a password. ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(view.getContext(), "You need to enter a password. ", Toast.LENGTH_SHORT).show();
                                 }else{
                                     dbHelper.addPassword(entryArrayList.get(position).getId(),m_Text);
                                     entryArrayList.get(position).setPassword(m_Text);
@@ -188,7 +222,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
                                     notifyItemChanged(position);
                                 }
                                 else {
-                                    Toast.makeText(view.getContext(), "Wrong Password ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(view.getContext(), "Wrong Password", Toast.LENGTH_SHORT).show();
                                 }
                             }else{
                                 if(dbHelper.deletePassword(entryArrayList.get(position).getId(),m_Text)){
@@ -200,7 +234,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.MyViewHolder
                                     notifyItemRangeChanged(position, entryArrayList.size());
                                 }
                                 else{
-                                    Toast.makeText(view.getContext(), "You need to enter right password or master password ", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(view.getContext(), "You need to enter right password", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }

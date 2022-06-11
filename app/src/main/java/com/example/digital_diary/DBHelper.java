@@ -22,7 +22,8 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String LOCATION_COL = "location";
     private static final String DATE_COL = "date";
     private static final String MEDIA_COL= "mediaPath";
-
+    private static final String LONGTITUDE_COL = "longtitude";
+    private static final String LATIDUDE_COL = "latidude";
 
     public DBHelper(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -37,6 +38,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + LOCATION_COL + " TEXT,"
                 + DATE_COL + " TEXT,"
                 + MEDIA_COL + " TEXT,"
+                + LONGTITUDE_COL+ " REAL,"
+                + LATIDUDE_COL + " REAL,"
                 + PASSWORD_COL + " TEXT)";
         sqLiteDatabase.execSQL(query);
     }
@@ -55,6 +58,8 @@ public class DBHelper extends SQLiteOpenHelper {
         values.put(ENTRY_COL,entry.getEnrtyText());
         values.put(LOCATION_COL,entry.getLocation());
         values.put(MEDIA_COL,entry.getMediaPath());
+        values.put(LONGTITUDE_COL,entry.getLongtidude());
+        values.put(LATIDUDE_COL,entry.getLatidude());
         db.insert(TABLE_NAME,null,values);
         db.close();
     }
@@ -97,7 +102,7 @@ public class DBHelper extends SQLiteOpenHelper {
         Log.i("dfaf", "deletePassword: "+id);
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " +ID_COL+"= ?",selectingArgs );
         if (cursor.moveToFirst()) {
-            if(cursor.getString(6).equals(password)){
+            if(cursor.getString(8).equals(password)){
                 values.putNull(PASSWORD_COL);
                 db.update(TABLE_NAME,values,""+ID_COL+"=?",new String[]{id});
                 db.close();
@@ -118,8 +123,29 @@ public class DBHelper extends SQLiteOpenHelper {
                         cursor.getString(2),
                         cursor.getString(3),
                         cursor.getString(4),
-                        cursor.getString(6),
-                        cursor.getString(0)));
+                        cursor.getString(8),
+                        cursor.getString(0),
+                        cursor.getString(5)));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        return entries;
+    }
+    public ArrayList<Entry> getAllEntriesWitHLocation(){
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        if (cursor.moveToFirst()) {
+            do {
+                entries.add(new Entry(cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getString(4),
+                        cursor.getString(8),
+                        cursor.getString(0),
+                        cursor.getString(5),
+                        cursor.getDouble(7),
+                        cursor.getDouble(6)));
             } while (cursor.moveToNext());
         }
         cursor.close();

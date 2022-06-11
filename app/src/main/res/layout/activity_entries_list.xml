@@ -4,22 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#111111"
     tools:context=".EntriesListActivity">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="33dp"
-        tools:layout_editor_absoluteY="552dp">
-
-    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/entryListView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#00f"
+        android:background="#111111"
         app:layout_constraintBottom_toTopOf="@+id/addEntryButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,8 +24,18 @@
         android:layout_height="45dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="4dp"
-        android:background="#000f"
+        android:background="#111111"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_new_note" />
+
+    <ImageButton
+        android:id="@+id/mapButton"
+        android:layout_width="50dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="16dp"
+        android:background="#111111"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entryListView"
+        app:srcCompat="@drawable/ic_map" />
 </androidx.constraintlayout.widget.ConstraintLayout>

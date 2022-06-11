@@ -13,6 +13,8 @@ public class Entry implements Serializable {
     private String date;
     private String mediaPath;
     private String ıd;
+    private double latidude;
+    private double longtidude;
 
     public Entry(String title, String enrtyText, String location, String date,String password) {
         this.title = title;
@@ -22,13 +24,40 @@ public class Entry implements Serializable {
         this.password= password;
     }
 
-    public Entry(String title, String enrtyText, String location, String date,String password,String ıd) {
+    public Entry(String title, String enrtyText, String location, String date,String password,String ıd,String mediaPath) {
         this.title = title;
         this.enrtyText = enrtyText;
         this.password = password;
         this.location = location;
         this.date = date;
         this.ıd = ıd;
+        this.mediaPath=mediaPath;
+    }
+    public Entry(String title, String enrtyText, String location, String date,String password,String ıd,String mediaPath,double latidude,double longtidude) {
+        this.title = title;
+        this.enrtyText = enrtyText;
+        this.password = password;
+        this.location = location;
+        this.date = date;
+        this.ıd = ıd;
+        this.mediaPath=mediaPath;
+        this.longtidude=longtidude;
+        this.latidude = latidude;
+    }
+    public double getLatidude() {
+        return latidude;
+    }
+
+    public void setLatidude(double latidude) {
+        this.latidude = latidude;
+    }
+
+    public double getLongtidude() {
+        return longtidude;
+    }
+
+    public void setLongtidude(double longtidude) {
+        this.longtidude = longtidude;
     }
 
     public String getId() {
